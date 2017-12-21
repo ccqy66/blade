@@ -70,10 +70,12 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest fullHttpRequest) {
+        //包装request对象
         Request  request  = HttpRequest.build(ctx, fullHttpRequest);
+        //生成response对象
         Response response = HttpResponse.build(ctx, date);
         boolean  isStatic = false;
-        // route signature
+        // route signature 构建路由签名
         Signature signature = Signature.builder().request(request).response(response).build();
         try {
 
@@ -88,7 +90,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
                 isStatic = true;
                 return;
             }
-
+            //根据url查找路由
             Route route = routeMatcher.lookupRoute(request.method(), uri);
             if (null == route) {
                 log.warn("Not Found\t{}", uri);

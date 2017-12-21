@@ -274,6 +274,7 @@ public class RouteMatcher {
      */
     private boolean matchesPath(String routePath, String pathToMatch) {
         routePath = routePath.replaceAll(PathKit.VAR_REGEXP, PathKit.VAR_REPLACE);
+        Pattern pattern = Pattern.compile(PathKit.VAR_REGEXP);
         return pathToMatch.matches("(?i)" + routePath);
     }
 

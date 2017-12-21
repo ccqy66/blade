@@ -181,14 +181,17 @@ public class NettyServer implements Server {
 
 
     private void parseCls(Class<?> clazz) {
+        //注册bean
         if (null != clazz.getAnnotation(Bean.class)) blade.register(clazz);
         if (null != clazz.getAnnotation(Path.class)) {
+            //如果是Path注解，默认也当作是一个bean来处理，所以如果没有注册的话，需要先注册的
             if (null == blade.ioc().getBean(clazz)) {
                 blade.register(clazz);
             }
             Object controller = blade.ioc().getBean(clazz);
             routeBuilder.addRouter(clazz, controller);
         }
+        //注册拦截器（web hook），class实现了WebHook接口，且不是Bean就被认为是一个WebHook
         if (ReflectKit.hasInterface(clazz, WebHook.class) && null != clazz.getAnnotation(Bean.class)) {
             Object hook = blade.ioc().getBean(clazz);
             routeBuilder.addWebHook(clazz, hook);

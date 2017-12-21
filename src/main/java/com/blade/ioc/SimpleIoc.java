@@ -29,6 +29,7 @@ public class SimpleIoc implements Ioc {
      */
     @Override
     public void addBean(String name, Object bean) {
+        //包装bean，包含bean对象和类型
         BeanDefine beanDefine = new BeanDefine(bean);
         addBean(name, beanDefine);
         // add interface
@@ -146,6 +147,7 @@ public class SimpleIoc implements Ioc {
      * Register @Bean marked objects
      */
     private Object addBean(String name, Class<?> beanClass, boolean singleton) {
+        //根据类型创建一个对象
         BeanDefine beanDefine = this.getBeanDefine(beanClass, singleton);
 
         if (pool.put(name, beanDefine) != null) {

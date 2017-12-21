@@ -26,11 +26,12 @@ public class RouteBuilder {
 
     public void addWebHook(final Class<?> webHook, Object hook) {
         Path   path    = webHook.getAnnotation(Path.class);
+        //默认拦截所有接口
         String pattern = "/.*";
         if (null != path) {
             pattern = path.value();
         }
-
+        //获取WebHook的接口的拦截方法
         Method before = ReflectKit.getMethod(webHook, "before", Signature.class);
         Method after  = ReflectKit.getMethod(webHook, "after", Signature.class);
 
