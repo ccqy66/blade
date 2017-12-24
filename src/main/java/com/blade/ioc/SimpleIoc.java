@@ -149,12 +149,13 @@ public class SimpleIoc implements Ioc {
     private Object addBean(String name, Class<?> beanClass, boolean singleton) {
         //根据类型创建一个对象
         BeanDefine beanDefine = this.getBeanDefine(beanClass, singleton);
-
+        //将对象添加到bean池中
         if (pool.put(name, beanDefine) != null) {
             log.warn("Duplicated Bean: {}", name);
         }
 
-        // add interface
+        // add interface 增加接口与bean的映射，不过一个接口只能映射到一个bean上，暂时不懂这么设计的
+        //原因 TODO
         Class<?>[] interfaces = beanClass.getInterfaces();
         if (interfaces.length > 0) {
             for (Class<?> interfaceClazz : interfaces) {

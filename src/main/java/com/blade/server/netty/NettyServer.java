@@ -107,7 +107,7 @@ public class NettyServer implements Server {
                 .forEach(this::parseCls);
 
         routeBuilder.register();
-
+        //Bean处理前回调
         this.processors.stream().sorted(new OrderComparator<>()).forEach(b -> b.preHandle(blade));
 
         Ioc ioc = blade.ioc();
@@ -116,6 +116,7 @@ public class NettyServer implements Server {
         }
 
         List<BeanDefine> beanDefines = ioc.getBeanDefines();
+        //处理Bean的成员变量的注入
         if (BladeKit.isNotEmpty(beanDefines)) {
             beanDefines.forEach(b -> BladeKit.injection(ioc, b));
         }
@@ -181,8 +182,9 @@ public class NettyServer implements Server {
 
 
     private void parseCls(Class<?> clazz) {
-        //注册bean
+        //注册bean,会根据clazz生成一个对象,要求@Bean的注解一定要有无参构造器
         if (null != clazz.getAnnotation(Bean.class)) blade.register(clazz);
+        //是一个Controller
         if (null != clazz.getAnnotation(Path.class)) {
             //如果是Path注解，默认也当作是一个bean来处理，所以如果没有注册的话，需要先注册的
             if (null == blade.ioc().getBean(clazz)) {
@@ -191,7 +193,7 @@ public class NettyServer implements Server {
             Object controller = blade.ioc().getBean(clazz);
             routeBuilder.addRouter(clazz, controller);
         }
-        //注册拦截器（web hook），class实现了WebHook接口，且不是Bean就被认为是一个WebHook
+        //注册拦截器（web hook），class实现了WebHook接口，且是Bean就被认为是一个WebHook
         if (ReflectKit.hasInterface(clazz, WebHook.class) && null != clazz.getAnnotation(Bean.class)) {
             Object hook = blade.ioc().getBean(clazz);
             routeBuilder.addWebHook(clazz, hook);
@@ -199,6 +201,7 @@ public class NettyServer implements Server {
         if (ReflectKit.hasInterface(clazz, BeanProcessor.class) && null != clazz.getAnnotation(Bean.class)) {
             this.processors.add((BeanProcessor) blade.ioc().getBean(clazz));
         }
+        //注册异常处理器
         if (isExceptionHandler(clazz)) {
             ExceptionHandler exceptionHandler = (ExceptionHandler) blade.ioc().getBean(clazz);
             blade.exceptionHandler(exceptionHandler);

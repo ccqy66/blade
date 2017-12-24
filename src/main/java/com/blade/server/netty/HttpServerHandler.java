@@ -75,7 +75,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
         //生成response对象
         Response response = HttpResponse.build(ctx, date);
         boolean  isStatic = false;
-        // route signature 构建路由签名
+        // route signature 构建路由签名(请求和响应)
         Signature signature = Signature.builder().request(request).response(response).build();
         try {
 
@@ -84,7 +84,7 @@ public class HttpServerHandler extends SimpleChannelInboundHandler<FullHttpReque
 
             // write session
             WebContext.set(new WebContext(request, response));
-
+            //判断是否为请求静态资源
             if (isStaticFile(uri)) {
                 staticFileHandler.handle(ctx, request, response);
                 isStatic = true;

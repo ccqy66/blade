@@ -45,6 +45,7 @@ public class RouteMatcher {
 
     private Map<HttpMethod, Map<Integer, FastRouteMappingInfo>> regexRoutes        = new HashMap<>();
     private Map<String, Route>                                  staticRoutes       = new HashMap<>();
+    //保存了所有的url匹配的正则规则
     private Map<HttpMethod, Pattern>                            regexRoutePatterns = new HashMap<>();
     private Map<HttpMethod, Integer>                            indexes            = new HashMap<>();
     private Map<HttpMethod, StringBuilder>                      patternBuilders    = new HashMap<>();
@@ -322,7 +323,9 @@ public class RouteMatcher {
             matcher = PATH_VARIABLE_PATTERN.matcher(path);
         }
         boolean      find             = false;
+        //保存所有的变量名
         List<String> uriVariableNames = new ArrayList<>();
+        //路径中有变量,将路径中的变量名提取出来，例如:name->name
         while (matcher != null && matcher.find()) {
             if (!find) {
                 find = true;
@@ -331,6 +334,7 @@ public class RouteMatcher {
             uriVariableNames.add(group.substring(1));   // {id} -> id
         }
         HttpMethod httpMethod = route.getHttpMethod();
+        //有变量 或者 是一个webHooK
         if (find || BladeKit.isWebHook(httpMethod)) {
             if (regexRoutes.get(httpMethod) == null) {
                 regexRoutes.put(httpMethod, new HashMap<>());
